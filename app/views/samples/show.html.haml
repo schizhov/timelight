@@ -1,0 +1,7 @@
+%table
+ %tbody
+  - @image_urls.each do |row|
+   %tr
+    - row.each do |column|
+     %td
+      %img{:src => "#{column}"}

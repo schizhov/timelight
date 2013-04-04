@@ -2,21 +2,41 @@ require 'RMagick'
 
 class SamplesController < ApplicationController
 
-	#attr_reader :image = "assets/samples/1/afmk1.jpg"
+	GAMMA_LOW = 0.3
+	GAMMA_HIGH = 2.11
 
-	attr_reader :image #= "samples/1"
+	attr_reader :image 
 
-	attr_reader :images
+	attr_reader :image_urls
 
 	def index
 		@image = "assets/samples/1/afmk1.jpg"
 		
 	end 
 
-	def show
-		im = image(params[:id],1).resize_to_fill(200,200).gamma_correct(1.0).border(1,1, "#000")	
-		send_data im.to_blob, :type	=> 'image/png' , :disposition => 'inline'
+	def gamma_value (index, number)
+		GAMMA_LOW + (index.to_f*((GAMMA_HIGH-GAMMA_LOW)/number))
 	end
+
+	def image_url (sample, index) 
+		"#{sample}/thumbnails/#{index}"
+	end
+
+	def show
+		@image_urls = Array.new
+		12.times { |x|
+			@image_urls[x] = image_url(params[:id], x)
+		}
+		@image_urls = @image_urls.each_slice(4).to_a
+
+		#send_data images[1].to_blob, :type	=> 'image/png' , :disposition => 'inline'
+	end
+
+	def thumbnail
+		image = image(params[:sample],1).resize_to_fill(100,100).gamma_correct(gamma_value(params[:id], 12)).border(2,2, "#000")
+		send_data image.to_blob, :type	=> 'image/png' , :disposition => 'inline'
+	end
+
 
 	def image (sample, number)
 		Magick::Image.read("#{Rails.root}/app/assets/images/samples/#{sample}/afmk#{number}.jpg").first

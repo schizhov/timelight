@@ -54,6 +54,8 @@ Timelight::Application.routes.draw do
 
   match 'samples/:id' => 'samples#show'
 
+  match 'samples/:sample/thumbnails/:id' => 'samples#thumbnail'
+
   # See how all your routes lay out with "rake routes"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.

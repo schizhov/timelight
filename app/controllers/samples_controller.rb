@@ -14,7 +14,11 @@ class SamplesController < ApplicationController
 	end 
 
 	def show
-		im = Magick::Image.read("#{Rails.root}/app/assets/images/samples/1/afmk1.jpg").first
+		im = image(params[:id],1).resize_to_fill(200,200).gamma_correct(1.0).border(1,1, "#000")	
 		send_data im.to_blob, :type	=> 'image/png' , :disposition => 'inline'
 	end
+
+	def image (sample, number)
+		Magick::Image.read("#{Rails.root}/app/assets/images/samples/#{sample}/afmk#{number}.jpg").first
+	end		
 end

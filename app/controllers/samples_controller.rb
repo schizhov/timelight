@@ -2,8 +2,11 @@ require 'RMagick'
 
 class SamplesController < ApplicationController
 
-	GAMMA_LOW = 0.3
-	GAMMA_HIGH = 2.11
+	GAMMA_LOW = 0.5
+	GAMMA_HIGH = 1.31
+
+	SIGMA_LOW = 0.001
+	SIGMA_HIGH = 0.51
 
 	attr_reader :image 
 
@@ -16,6 +19,10 @@ class SamplesController < ApplicationController
 
 	def gamma_value (index, number)
 		GAMMA_LOW + (index.to_f*((GAMMA_HIGH-GAMMA_LOW)/number))
+	end
+
+	def blur (image, index, number) 
+		image.blur_image(0.0, SIGMA_HIGH - (index.to_f*(SIGMA_HIGH-SIGMA_LOW)/number))
 	end
 
 	def image_url (sample, index) 
@@ -33,7 +40,9 @@ class SamplesController < ApplicationController
 	end
 
 	def thumbnail
-		image = image(params[:sample],1).resize_to_fill(100,100).gamma_correct(gamma_value(params[:id], 12)).border(2,2, "#000")
+		image = image(params[:sample],1).resize_to_fill(100,100).gamma_correct(gamma_value(params[:id], 12))
+
+		image = blur(image, params[:id], 12).border(2,2, "#000")
 		send_data image.to_blob, :type	=> 'image/png' , :disposition => 'inline'
 	end
 
